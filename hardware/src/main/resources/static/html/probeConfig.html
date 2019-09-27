@@ -85,7 +85,7 @@
 	function initTable(probeMac) {
         $("#probeTable").bootstrapTable('destroy');
 		$('#probeTable').bootstrapTable({
-			url : "../../ac/requestSelect?probeMac="+probeMac, //请求后台的URL（*）
+			url : "../../probe/getProbeConfig", //请求后台的URL（*）
             responseHandler:function (res) {
                 return res.data;
             },
@@ -117,30 +117,19 @@
 				title : '探针mac地址',
 				sortable : true
 			},{
-				field : 'wifiSsid',
-				title : 'wifi名',
-                sortable : true
-			},{
-				field : 'wifiPwd',
-				title : 'wifi密码',
-                sortable : true
-			},{
-				field : 'wifiStatus',
-				title : '探针状态',
-                sortable : true
-			},{
-				field : 'serverIp',
-				title : '服务器ip',
-                sortable : true
-			},{
-				field : 'serverPort',
-				title : '服务器端口',
-                sortable : true
-			},{
                 field : 'version',
                 title : '探针固件版本',
                 sortable : true
-            }],
+            },{
+				field : 'onLineStr',
+				title : '探针状态',
+                sortable : true
+			},{
+                field : 'button',
+                title : '操作',
+                events: operateEvents,
+                formatter: operateFormatter
+            }]
 		});
 	};
 
@@ -158,6 +147,58 @@
         var probeMac = $("#search_probeMac").val();
         initTable(probeMac);
     }
+
+    function operateFormatter(value, row, index) {
+        return [
+            '<button type="button" class="updateProbeUtc btn btn-primary  btn-sm" style="margin-right:15px;">更新探针UTC时间</button>',
+            '<button type="button" class="getProbeVersion btn btn-primary  btn-sm" style="margin-right:15px;">获取探针版本</button>',
+            // '<button type="button" class="updateProbeVersion btn btn-primary  btn-sm" style="margin-right:15px;">升级探针版本</button>'
+        ].join('');
+    }
+
+    window.operateEvents = {
+        'click .updateProbeUtc': function (e, value, row, index) {
+            var probeMac = row["probeMac"];
+            $.ajax({
+                type : 'POST',
+                dataType : "json",
+                url : "../../gwTest/updateTime",
+                data : {
+                    "mac" : probeMac
+                },
+                success : function(data) {
+                    console.log(data);
+                    if(data.code != 0){
+                        alert(data.msg);
+					}else{
+                        alert("发送指令成功");
+					}
+                }
+            });
+        },
+        'click .getProbeVersion': function (e, value, row, index) {
+            var probeMac = row["probeMac"];
+            $.ajax({
+                type : 'POST',
+                dataType : "json",
+                url : "../../gwTest/queryGwVersion",
+                data : {
+                    "mac" : probeMac
+                },
+                success : function(data) {
+                    console.log(data);
+                    if(data.code != 0){
+                        alert(data.msg);
+                    }else{
+                        alert("发送指令成功，请等待设备应答然后刷新");
+                    }
+                }
+            });
+        },
+        'click .updateProbeVersion': function (e, value, row, index) {
+            alert("C");
+        }
+    };
 
     function setServer(){
         $("#modal-container-985684").modal();
@@ -404,18 +445,18 @@
 								<div class="x_title">
 									<div class="x_content">
 										<div id="toolbar" class="btn-group">
-											<button id="btn_add" type="button" class="btn btn-default" onclick = "openProbe()">
-												<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>打开
-											</button>
-											<button id="btn_delete" type="button" class="btn btn-default" onclick = "closeProbe()">
-												<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭
-											</button>
-                                            <button id="btn_edit" type="button" class="btn btn-default" onclick = "setServer()">
-                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>配置远程服务器
-                                            </button>
-                                            <button id="btn_export" type="button" class="btn btn-default" onclick = "setConfig()">
-                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>配置wifi
-                                            </button>
+											<!--<button id="btn_add" type="button" class="btn btn-default" onclick = "openProbe()">-->
+												<!--<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>打开-->
+											<!--</button>-->
+											<!--<button id="btn_delete" type="button" class="btn btn-default" onclick = "closeProbe()">-->
+												<!--<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭-->
+											<!--</button>-->
+                                            <!--<button id="btn_edit" type="button" class="btn btn-default" onclick = "setServer()">-->
+                                                <!--<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>配置远程服务器-->
+                                            <!--</button>-->
+                                            <!--<button id="btn_export" type="button" class="btn btn-default" onclick = "setConfig()">-->
+                                                <!--<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>配置wifi-->
+                                            <!--</button>-->
 										</div>
 										<table id="probeTable"></table>
 									</div>

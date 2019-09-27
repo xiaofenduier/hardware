@@ -7,8 +7,10 @@ import java.util.Map;
 
 import com.sunshine.hardware.model.BraceletData;
 import com.sunshine.hardware.model.ErrorCode;
+import com.sunshine.hardware.model.Probe;
 import com.sunshine.hardware.model.ReturnBody;
 import com.sunshine.hardware.service.BraceletService;
+import com.sunshine.hardware.service.ProbeService;
 import com.sunshine.hardware.util.Constants;
 import com.sunshine.hardware.util.TimeUtil;
 import org.slf4j.Logger;
@@ -47,6 +49,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<byte[]> {
 
     @Autowired
     private BraceletService braceletService;
+
+    @Autowired
+    private ProbeService probeService;
 
     private static final Logger log = LoggerFactory.getLogger(ServerHandler.class);
 
@@ -274,7 +279,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<byte[]> {
                                 if (qgv.getStatus() == 0) {// 成功
                                     rb = ReturnBody.success(qgv);
                                     // 如网关固件版本号比服务器上的低，可以送发起固件升级指令
-    
+                                    Probe probe = new Probe();
+                                    probe.setVersion(qgv.getAppVersion().toString());
+                                    probeService.updateProbe(probe);
                                 }
                                 else {// 失败
                                     log.error(qgv.getAckMsg());

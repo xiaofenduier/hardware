@@ -289,7 +289,7 @@ public class GWTestController {
         DeferredResult<Object> result = new DeferredResult<Object>(Constants.DeferredResultTimeOut);//设置超时
         if(StringUtils.isBlank(mac) ){
             result.setResult(ReturnBody.fail(ErrorCode.AUTHOR_FAIL.getCode(), ErrorCode.AUTHOR_FAIL.getMsg())) ;
-           return result;
+            return result;
         }
         ChannelHandlerContext ctx=Constants.ctxMap.get("tcp_"+mac);//查询设备是否在线
         if(ctx==null){

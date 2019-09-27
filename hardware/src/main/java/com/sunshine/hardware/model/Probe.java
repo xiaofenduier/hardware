@@ -19,6 +19,26 @@ public class Probe extends Page {
 
     private Integer onLine;
 
+    private String onLineStr;
+
+    private String version;
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getOnLineStr() {
+        return onLineStr;
+    }
+
+    public void setOnLineStr(String onLineStr) {
+        this.onLineStr = onLineStr;
+    }
+
     public Integer getOnLine() {
         return onLine;
     }

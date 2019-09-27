@@ -77,6 +77,10 @@ public class ProbeService {
         return probeResponseList;
     }
 
+    public void updateProbe(Probe probe){
+        probeDao.updateProbe(probe);
+    }
+
     public long countProbes(Probe probe) {
         return probeDao.countProbe(probe);
     }
@@ -240,6 +244,25 @@ public class ProbeService {
             probeResponse.setRegularThroughput(regularThroughput);
             probeResponseList.add(probeResponse);
 
+        });
+        return probeResponseList;
+    }
+
+    public List<ProbeResponse> getProbeConfig(){
+        Probe probe = new Probe();
+        List<ProbeResponse>  probeResponseList = new ArrayList<>();
+        List<Probe> probeList = probeDao.selectProbe(probe);
+        probeList.stream().forEach(obj -> {
+            ProbeResponse probeResponse = new ProbeResponse();
+            BeanUtils.copyProperties(obj, probeResponse);
+            //查询设备是否在线
+            ChannelHandlerContext ctx= Constants.ctxMap.get("tcp_"+obj.getProbeMac());
+            if(ctx==null){
+                probeResponse.setOnLineStr(StatusCode.OFFLINE.getStatus());
+            }else{
+                probeResponse.setOnLineStr(StatusCode.ONLINE.getStatus());
+            }
+            probeResponseList.add(probeResponse);
         });
         return probeResponseList;
     }
