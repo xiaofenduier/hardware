@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>首页 </title>
+
+    <!-- Bootstrap -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../css/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="../css/green.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="../css/custom.min.css" rel="stylesheet">
+
+    <link href="../css/bootstrap-table.css" rel="stylesheet">
+
+    <link href="../css/bootstrap-select.min.css" rel="stylesheet">
+
+    <link href="../css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="../js/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/bootstrap-table.js"></script>
+    <script src="../js/bootstrap-select.min.js"></script>
+    <script src="../js/bootstrap-datetimepicker.js"></script>
+    <script src="../js/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="../js/echarts.common.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            initList();
+            initDate();
+            initStartDate();
+            initEndDate();
+            getLoginUser();
+        });
+
+        function getLoginUser(){
+            $.ajax({
+                type : 'POST',
+                dataType : "json",
+                url : "../../user/getLoginUser",
+                success : function(data) {
+                    $("#username_login").html(data);
+                }
+            });
+        }
+
+        function logout(){
+            $.ajax({
+                type : 'POST',
+                dataType : "json",
+                url : "../../user/logout",
+                success : function(data) {
+                    location.href = "../../login.html";
+                }
+            });
+        }
+
+        function initDate(){
+            $('#time').datetimepicker({
+                language:  'zh-CN',
+                format: 'yyyy-MM-dd hh:ii',
+                autoclose: 1,
+                minuteStep: 1,
+                startView: 3, //这里就设置了默认视图为年视图
+                minView: 0, //设置最小视图为年视图
+                forceParse: 0 ///选择后直接带回；要加！
+            }).on('changeDate',function(ev){
+                initProbe2();
+            });
+        }
+
+        function initStartDate(){
+            $('#starttime').datetimepicker({
+                language:  'zh-CN',
+                format: 'yyyy-MM-dd hh:ii',
+                autoclose: 1,
+                minuteStep: 1,
+                startView: 3, //这里就设置了默认视图为年视图
+                minView: 0, //设置最小视图为年视图
+                forceParse: 0 ///选择后直接带回；要加！
+            });
+        }
+
+        function initEndDate(){
+            $('#endtime').datetimepicker({
+                language:  'zh-CN',
+                format: 'yyyy-MM-dd hh:ii',
+                autoclose: 1,
+                minuteStep: 1,
+                startView: 3, //这里就设置了默认视图为年视图
+                minView: 0, //设置最小视图为年视图
+                forceParse: 0 ///选择后直接带回；要加！
+            }).on('changeDate',function(ev){
+                initProbe3();
+            });
+        }
+
+        function getProbeMac(){
+            var probeMac = $("#lineChartSelect").val();
+            initProbe(probeMac);
+        }
+
+        function initList(){
+            $.ajax({
+                type : 'POST',
+                dataType : "json",
+                url : "../../probe/initList",
+                success : function(response) {
+                    console.log(response);
+                    var option = "";
+                    var probeMacList = response.data.probeMacList;
+                    var probeCount = probeMacList.length;
+                    $("#probeCount").html(probeCount);
+                    if(probeMacList.length > 0){
+                        $.each(probeMacList, function(i, probeMac){
+                            option = option + "<option value = '"+probeMac+"'>"+probeMac+"</option>";
+                        });
+                        initProbe(probeMacList[0]);
+                    }
+                    $("#lineChartSelect").html(option);
+                    $('.selectpicker').selectpicker('refresh');
+                    initProbe2();
+                    initProbe3();
+                }
+            });
+        }
+
+        function initProbe3(){
+            var myChart = echarts.init(document.getElementById('barChart'));
+            myChart.showLoading({
+                text: "图表数据正在努力加载..."
+            });
+
+            var endTime = $("#endtime2").val();
+            if(endTime == null || endTime == ""){
+                endTime = new Date().getTime().toString();
+            }else{
+                endTime = Date.parse(new Date(endTime));
+            }
+            var beginTime = $("#starttime2").val();
+            if(beginTime == null || beginTime == ""){
+                beginTime = new Date().getTime() - 24 * 3600 * 1000;
+            }else{
+                beginTime = Date.parse(new Date(beginTime));
+            }
+            $.ajax({
+                type : 'post',
+                dataType : "json",
+                url : "../../probe/getProbeThroughtoutListByTimeWithMac",
+                data : {
+                    "beginTime": beginTime,
+                    "endTime" : endTime
+                },
+                success : function(result) {
+                    console.log(result);
+                    var probeMacList = result.data.probeMacList;
+                    var probeThroughtoutList = result.data.probeThroughtoutList
+                    myChart.hideLoading();
+                    myChart.setOption(option = {
+                        color: ['#3398DB'],
+                        tooltip : {
+                            trigger: 'axis',
+                            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                            }
+                        },
+                        grid: {
+                            left: '3%',
+                            right: '4%',
+                            bottom: '3%',
+                            containLabel: true
+                        },
+                        xAxis : [
+                            {
+                                type : 'category',
+                                data : probeMacList,
+                                axisTick: {
+                                    alignWithLabel: true
+                                }
+                            }
+                        ],
+                        yAxis : [
+                            {
+                                type : 'value'
+                            }
+                        ],
+                        series : [
+                            {
+                                name:'吞吐量',
+                                type:'bar',
+                                barWidth: '60%',
+                                data:probeThroughtoutList
+                            }
+                        ]
+                    });
+                }
+            });
+        }
+
+        function initProbe2(){
+            var myChart = echarts.init(document.getElementById('pieChart'));
+            myChart.showLoading({
+                text: "图表数据正在努力加载..."
+            });
+            var endTime = $("#time2").val();
+            if(endTime == null || endTime == ""){
+                endTime = new Date().getTime().toString();
+            }else{
+                endTime = Date.parse(new Date(endTime));
+            }
+            $.ajax({
+                type : 'post',
+                dataType : "json",
+                url : "../../probe/getProbeThroughtoutListByTime",
+                data : {
+                    "endTime" : endTime
+                },
+                success : function(result) {
+                    console.log(result);
+                    var probeMacList = result.data.probeMacList;
+                    var probeValueList = result.data.probeValueList;
+                    var regularTime = result.data.regularTime;
+                    console.log(probeMacList);
+                    console.log(probeValueList);
+                    myChart.hideLoading();
+                    myChart.setOption(option = {
+                        title : {
+                            text: '探针每分钟内吞吐量占比',
+                            subtext: regularTime,
+                            x:'center'
+                        },
+                        tooltip : {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: probeMacList
+                        },
+                        series : [
+                            {
+                                name: '访问来源',
+                                type: 'pie',
+                                radius : '55%',
+                                center: ['50%', '60%'],
+                                data: probeValueList,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                    }
+                                }
+                            }
+                        ]
+                    });
+                }
+            });
+        }
+
+        function initProbe(probeMac){
+            var myChart = echarts.init(document.getElementById('lineChart'));
+            myChart.showLoading({
+                text: "图表数据正在努力加载..."
+            });
+            $.ajax({
+                type : 'post',
+                dataType : "json",
+                url : "../../probe/getProbeThroughtoutListByMac",
+                data : {
+                    "probeMac" : probeMac
+                },
+                success : function(result) {
+                    var data = result.data.throughoutList;
+                    console.log(result);
+                    var maxthroughtout = 0;
+                    var maxprobe = "";
+                    $.each(data, function(i, obj){
+                        if(obj[1] > maxthroughtout){
+                            maxthroughtout = obj[1];
+                            maxprobe = obj[0];
+                        }
+                    });
+                    $("#maxthroughtout").html(maxthroughtout);
+                    $("#maxProbe").html(maxprobe);
+                    var startValue = result.data.regularTime;
+                    myChart.hideLoading();
+                    myChart.setOption(option = {
+                        title: {
+                            text: '探针吞吐量'
+                        },
+                        tooltip: {
+                            trigger: 'axis'
+                        },
+                        xAxis: {
+                            data: data.map(function (item) {
+                                return item[0];
+                            })
+                        },
+                        yAxis: {
+                            splitLine: {
+                                show: false
+                            }
+                        },
+                        toolbox: {
+                            left: 'center',
+                            feature: {
+                                dataZoom: {
+                                    yAxisIndex: 'none'
+                                },
+                                restore: {},
+                                saveAsImage: {}
+                            }
+                        },
+                        dataZoom: [{
+                            startValue: startValue
+                        }, {
+                            type: 'inside'
+                        }],
+                        visualMap: {
+                            top: 10,
+                            right: 10,
+                            pieces: [{
+                                gt: 0,
+                                lte: 50,
+                                color: '#096'
+                            }, {
+                                gt: 2,
+                                lte: 100,
+                                color: '#ffde33'
+                            }, {
+                                gt: 4,
+                                lte: 150,
+                                color: '#ff9933'
+                            }, {
+                                gt: 8,
+                                lte: 200,
+                                color: '#cc0033'
+                            }, {
+                                gt: 100,
+                                lte: 300,
+                                color: '#660099'
+                            }, {
+                                gt: 125,
+                                color: '#7e0023'
+                            }],
+                            outOfRange: {
+                                color: '#999'
+                            }
+                        },
+                        series: {
+                            name: '吞吐量',
+                            type: 'line',
+                            data: data.map(function (item) {
+                                return item[1];
+                            }),
+                            markLine: {
+                                silent: true,
+                                data: [{
+                                    yAxis: 0
+                                }, {
+                                    yAxis: 3
+                                }, {
+                                    yAxis: 5
+                                }, {
+                                    yAxis: 7
+                                }, {
+                                    yAxis: 10
+                                }]
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</head>
+
+<body class="nav-md" id = "app">
+<div class="container body">
+    <div class="main_container">
+        <div class="col-md-3 left_col">
+            <div class="left_col scroll-view">
+                <div class="navbar nav_title" style="border: 0;">
+                    <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>探针管理系统</span></a>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <!-- menu profile quick info -->
+                <div class="profile clearfix">
+                    <div class="profile_info">
+                        <span>欢迎,</span><span><h2 id = "username_login"></h2></span>
+                    </div>
+                </div>
+                <!-- /menu profile quick info -->
+
+                <br />
+                <!-- sidebar menu -->
+                <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                    <div class="menu_section">
+                        <ul class="nav side-menu">
+                            <li><a><i class="fa fa-home"></i> 首页 <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="index.html">首页</a></li>
+                                </ul>
+                            </li>
+                            <li><a><i class="fa fa-edit"></i> 探针前端管理 <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="probeLocation.html">蓝牙探针定位管理</a></li>
+                                    <li><a>无线网络管理<span class="fa fa-chevron-down"></span></a>
+                                        <ul class="nav child_menu">
+                                            <li class="sub_menu"><a href="probeStatus.html">探针实时状态监控</a>
+                                            </li>
+                                            <li><a href="probeThroughPut.html">探针数据吞吐量</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><a><i class="fa fa-desktop"></i> 探针统一网管平台 <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="probeConfig.html">配置下发管理</a></li>
+                                    <li><a href="probe.html">蓝牙探针接入授权</a></li>
+                                </ul>
+                            </li>
+                            <li><a><i class="fa fa-table"></i> 手环数据展示 <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="braceletdata.html">手环数据展示</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- /sidebar menu -->
+            </div>
+        </div>
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <!-- 数据纵览 -->
+            <div class="row tile_count">
+                <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
+                    <span class="count_top"><i class="fa fa-user"></i> 探针总数</span>
+                    <div class="count" id = "probeCount"></div>
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
+                    <span class="count_top"><i class="fa fa-clock-o"></i> 最大吞吐量</span>
+                    <div class="count" id = "maxthroughtout"></div>
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
+                    <span class="count_top"><i class="fa fa-clock-o"></i> 最大吞吐量出现时间</span>
+                    <div class="count" id = "maxProbe"></div>
+                </div>
+            </div>
+
+            <!--折线图-->
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="dashboard_graph">
+                        <div class="row x_title">
+                            <div class="col-md-6">
+                                <h3>数据总览 <small>直观数据</small></h3>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <select class="selectpicker" id="lineChartSelect" onchange="getProbeMac()">
+                                <!--<option v-for="probe in probeList" :value = probe>{{probe}}</option>-->
+                            </select>
+                            <div id="lineChart" class="demo-placeholder"></div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+            <br />
+
+            <!--饼图-->
+            <div class="row">
+                <div class="col-md-6 col-sm-12 col-xs-12">
+                    <div class="x_panel tile fixed_height_500">
+                        <div class="x_title">
+                            <h2>探针分钟数据对比饼图</h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <!--选择时间-->
+                            <div class="item form-group">
+                                <label for="time" class="control-label col-md-3 ">选择时间</label>
+                                <div class="input-group date form_date col-md-6 col-sm-3 col-xs-12" id = "time" data-link-field="time" >
+                                    <input class="form-control col-md-7 col-xs-12" type="text" id = "time2" value="" readonly>
+                                    <span class="input-group-addon">
+                                            <span class = "glyphicon glyphicon-remove"></span>
+                                        </span>
+                                    <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                </div>
+                            </div>
+                            <div id = "pieChart" class="demo-placeholder"></div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-md-6 col-sm-12 col-xs-12">
+                    <div class="x_panel tile fixed_height_500 overflow_hidden">
+                        <div class="x_title">
+                            <h2>探针时段数据对比柱状图</h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <!--选择时间-->
+                            <div class="item form-group">
+                                <label for="starttime" class="control-label col-md-2 ">开始时间</label>
+                                <div class="input-group date form_date col-md-4 col-sm-3 col-xs-6" id = "starttime" data-link-field="starttime" >
+                                    <input class="form-control col-md-5 col-xs-6" type="text" id = "starttime2" value="" readonly>
+                                    <span class="input-group-addon">
+                                            <span class = "glyphicon glyphicon-remove"></span>
+                                        </span>
+                                    <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label for="endtime" class="control-label col-md-2 ">结束时间</label>
+                                <div class="input-group date form_date col-md-4 col-sm-3 col-xs-6" id = "endtime" data-link-field="endtime" >
+                                    <input class="form-control col-md-5 col-xs-6" type="text" id = "endtime2" value="" readonly>
+                                    <span class="input-group-addon">
+                                            <span class = "glyphicon glyphicon-remove"></span>
+                                        </span>
+                                    <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                </div>
+                            </div>
+                            <div id = "barChart" class="demo-placeholder"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+            <div class="pull-right">
+                探针管理
+            </div>
+            <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<!-- FastClick -->
+<script src="../js/fastclick.js"></script>
+<!-- NProgress -->
+<script src="../js/nprogress.js"></script>
+<!-- iCheck -->
+<script src="../js/icheck.min.js"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="../js/custom.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!-- Meta, title, CSS, favicons, etc. -->
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>探针吞吐量管理 </title>
+
+	<!-- Bootstrap -->
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<!-- Font Awesome -->
+	<link href="../css/font-awesome.min.css" rel="stylesheet">
+	<!-- NProgress -->
+	<link href="../css/nprogress.css" rel="stylesheet">
+	<!-- iCheck -->
+	<link href="../css/green.css" rel="stylesheet">
+
+	<!-- Custom Theme Style -->
+	<link href="../css/custom.min.css" rel="stylesheet">
+
+    <link href="../css/bootstrap-table.css" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="../js/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/bootstrap-table.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		//初始化Table
+        initTable();
+        initTime();
+        getLoginUser();
+	});
+
+	function getLoginUser(){
+        $.ajax({
+            type : 'POST',
+            dataType : "json",
+            url : "../../user/getLoginUser",
+            success : function(data) {
+                $("#username_login").html(data);
+            }
+        });
+	}
+
+    function logout(){
+        $.ajax({
+            type : 'POST',
+            dataType : "json",
+            url : "../../user/logout",
+            success : function(data) {
+                location.href = "../../login.html";
+            }
+        });
+    }
+
+	function initTime(){
+        $.ajax({
+            type : 'POST',
+            dataType : "json",
+            url : "../../probe/getTime",
+            success : function(data) {
+                $("#time").html(data);
+            }
+        });
+	}
+
+	//初始化Table
+	function initTable() {
+		$('#probeTable').bootstrapTable({
+			url : "../../probe/getListThroughtout", //请求后台的URL（*）
+            responseHandler:function (res) {
+                return res.data;
+            },
+			method : 'post', //请求方式（*）
+			toolbar : '#toolbar', //工具按钮用哪个容器
+			striped : true, //是否显示行间隔色
+			cache : false, //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+			pagination : true, //是否显示分页（*）
+			sortable : true, //是否启用排序
+			sortOrder : "asc", //排序方式
+            sortName : "id", //排序字段
+			queryParams : queryParams,//传递参数（*）
+			sidePagination : "server", //分页方式：client客户端分页，server服务端分页（*）
+			pageNumber : 1, //初始化加载第一页，默认第一页
+			pageSize : 10, //每页的记录行数（*）
+			pageList : [ 10, 25, 50, 100 ], //可供选择的每页的行数（*）
+			showRefresh : true, //是否显示刷新按钮
+			showColumns : true, //是否显示 内容列下拉框
+			clickToSelect : true, //是否启用点击选中行
+			uniqueId : "id", //每一行的唯一标识，一般为主键列
+			cardView : false, //是否显示详细视图
+			detailView : false, //是否显示父子表
+			checkboxHeader : true,
+			maintainSelected : true, //设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+            onRefresh : onRefresh,
+            columns : [ {
+				checkbox : true
+			},{
+				field : 'id',
+				title : '序号',
+				sortable : true
+			},{
+				field : 'probeMac',
+				title : '探针mac',
+                sortable : true
+			},{
+				field : 'regularThroughput',
+				title : '实时吞吐量',
+                sortable : true,
+                formatter:function(value,row,index){
+				    var style = "";
+				    if(value > 100){
+                        style = '<span style="color:red">'+value+'item/s</span>';
+					}else if(value < 100){
+                        style = '<span style="color:grey">'+value+' item/s</span>';
+					}else{
+				        style = '<span style="color:greenyellow">'+value+' item/s</span>';
+					}
+                    return style;
+                }
+			}],
+		});
+		//600秒刷新一次
+        window.setInterval("initTime()", 60 * 1000);
+	};
+
+	queryParams = function(params){
+		var temp = { //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+			start : params.offset, //页码
+			pageSize : params.limit, //页面大小
+			orderType : params.order,
+			orderName : params.sort
+		};
+		return temp;
+	}
+	
+	function search() {
+		var probeMac = $("#search_probeMac").val();
+		$('#probeTable').bootstrapTable('refresh', {
+			query : { //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+				probeMac : probeMac
+			}
+		});
+    }
+
+    function onRefresh(params){
+        initTime();
+    }
+</script>
+</head>
+
+<body class="nav-md">
+	<div class="container body">
+		<div class="main_container">
+			<div class="col-md-3 left_col">
+				<div class="left_col scroll-view">
+					<div class="navbar nav_title" style="border: 0;">
+						<a href="index.html" class="site_title"><i class="fa fa-paw"></i>
+							<span>探针管理系统</span></a>
+					</div>
+
+					<div class="clearfix"></div>
+
+					<!-- menu profile quick info -->
+					<div class="profile clearfix">
+						<div class="profile_info">
+							<span>欢迎,</span><span><h2 id = "username_login"></h2></span>
+						</div>
+					</div>
+
+					<br />
+
+					<!-- sidebar menu -->
+					<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+						<div class="menu_section">
+							<ul class="nav side-menu">
+								<li><a><i class="fa fa-home"></i> 首页 <span class="fa fa-chevron-down"></span></a>
+									<ul class="nav child_menu">
+										<li><a href="index.html">首页</a></li>
+									</ul>
+								</li>
+								<li><a><i class="fa fa-edit"></i> 探针前端管理 <span class="fa fa-chevron-down"></span></a>
+									<ul class="nav child_menu">
+										<li><a href="probeLocation.html">蓝牙探针定位管理</a></li>
+										<li><a>无线网络管理<span class="fa fa-chevron-down"></span></a>
+                                            <ul class="nav child_menu">
+                                                <li class="sub_menu"><a href="probeStatus.html">探针实时状态监控</a>
+                                                </li>
+                                                <li><a href="probeThroughPut.html">探针数据吞吐量</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+									</ul>
+								</li>
+								<li><a><i class="fa fa-desktop"></i> 探针统一网管平台 <span class="fa fa-chevron-down"></span></a>
+									<ul class="nav child_menu">
+										<li><a href="probeConfig.html">配置下发管理</a></li>
+                                        <li><a href="probe.html">蓝牙探针接入授权</a></li>
+									</ul>
+								</li>
+								<li><a><i class="fa fa-table"></i> 手环数据展示 <span class="fa fa-chevron-down"></span></a>
+									<ul class="nav child_menu">
+										<li><a href="braceletdata.html">手环数据展示</a></li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!-- /sidebar menu -->
+
+				</div>
+			</div>
+
+			<!-- top navigation -->
+			<div class="top_nav">
+				<div class="nav_menu">
+					<nav>
+						<div class="nav toggle">
+							<a id="menu_toggle"><i class="fa fa-bars"></i></a>
+						</div>
+						
+						<ul class="nav navbar-nav navbar-right">
+                			<li class="">
+                  				<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    				注销 <span class=" fa fa-angle-down"></span>
+                  				</a>
+                  				<ul class="dropdown-menu dropdown-usermenu pull-right">
+                    				<li><a href="javascript:void(0)" onclick = "logout()"><i class="fa fa-sign-out pull-right"></i> 退出登录</a></li>
+                  				</ul>
+                			</li>
+              			</ul>
+					</nav>
+				</div>
+			</div>
+			<!-- /top navigation -->
+
+			<!-- page content -->
+			<div class="right_col" role="main">
+				<div class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12">
+						<div class="panel panel-default">
+							<!-- 	查询 -->
+							<div class="panel-heading">查询条件</div>
+							<div class="panel-body">
+								<form id="formSearch" class="form-horizontal">
+									<div class="form-group" style="margin-top: 15px">
+										<label class="control-label col-sm-1" for="search_probeMac">探针mac</label>
+										<div class="col-sm-1">
+											<input type="text" class="form-control" id="search_probeMac">
+										</div>
+										<div class="col-sm-4" style="text-align: left;">
+											<button type="button" style="margin-left: 50px"
+												id="btn_query" class="btn btn-primary" onclick="search()">查询</button>
+										</div>
+									</div>
+								</form>
+							</div>
+							
+							<div class="x_panel">
+								<div class="x_title">
+									<div class="x_content">
+										<div id="toolbar" class="btn-group">
+											<span class="glyphicon glyphicon-time" aria-hidden="true" style = 'margin-left: 100px'></span>上次刷新时间: <span id = "time"></span>
+										</div>
+										<table id="probeTable"></table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /page content -->
+
+			<!-- footer content -->
+			<footer>
+				<div class="pull-right">
+
+				</div>
+				<div class="clearfix"></div>
+			</footer>
+			<!-- /footer content -->
+		</div>
+	</div>
+    <!-- FastClick -->
+    <script src="../js/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="../js/nprogress.js"></script>
+    <!-- iCheck -->
+    <script src="../js/icheck.min.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="../js/custom.min.js"></script>
+</body>
+</html>
