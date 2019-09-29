@@ -25,7 +25,7 @@ public class AsyncBraceleDataSchedule {
     @Autowired
     private BraceletService braceletService;
 
-    //@Scheduled(cron = "0/15 * * * * ?")
+    @Scheduled(cron = "0/15 * * * * ?")
     public void exportData(){
         BraceletDataRequest braceletDataRequest = new BraceletDataRequest();
         braceletDataRequest.setBeginTime(System.currentTimeMillis() - 15 * 1000);
