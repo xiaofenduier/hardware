@@ -25,7 +25,7 @@ public class AsyncBraceleDataSchedule {
     @Autowired
     private BraceletService braceletService;
 
-    //@Scheduled(cron = "0/15 * * * * ?")
+    @Scheduled(cron = "0/15 * * * * ?")
     public void exportData(){
         BraceletDataRequest braceletDataRequest = new BraceletDataRequest();
         braceletDataRequest.setBeginTime(System.currentTimeMillis() - 15 * 1000);
@@ -37,7 +37,7 @@ public class AsyncBraceleDataSchedule {
         map.put("data", gson.toJson(braceletDataList));
         log.info(gson.toJson(map));
         log.info("---------"+gson.toJson(map).getBytes().length);
-        //HttpUtil.sendPost(map, "http://www.sunshineforce.com:7014/data/data/getData");
+        HttpUtil.sendPost(map, "http://www.sunshineforce.com:7014/data/data/getData");
         //HttpUtil.sendPost(map, "http://localhost:8888/data/getData");
     }
 }
