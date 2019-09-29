@@ -152,7 +152,7 @@
         return [
             '<button type="button" class="updateProbeUtc btn btn-primary  btn-sm" style="margin-right:15px;">更新探针UTC时间</button>',
             '<button type="button" class="getProbeVersion btn btn-primary  btn-sm" style="margin-right:15px;">获取探针版本</button>',
-            // '<button type="button" class="updateProbeVersion btn btn-primary  btn-sm" style="margin-right:15px;">升级探针版本</button>'
+            '<button type="button" class="updateProbeVersion btn btn-primary  btn-sm" style="margin-right:15px;">升级探针版本</button>'
         ].join('');
     }
 
@@ -196,7 +196,28 @@
             });
         },
         'click .updateProbeVersion': function (e, value, row, index) {
-            alert("C");
+            var probeMac = row["probeMac"];
+            $.ajax({
+                type : 'POST',
+                dataType : "json",
+                url : "../../gwTest/queryGwVersion",
+                data : {
+                    "mac" : probeMac,
+					"port" : "8080",
+					"versionType":0,
+					"filePath":"../../file",
+					"fileName":"gateway_app_v1.00.bin",
+					"version":"1.00"
+                },
+                success : function(data) {
+                    console.log(data);
+                    if(data.code != 0){
+                        alert(data.msg);
+                    }else{
+                        alert("发送升级指令成功，请等待设备应答然后刷新");
+                    }
+                }
+            });
         }
     };
 
