@@ -37,8 +37,8 @@ public class ProbeService {
             String probeMac = probeResponse.getProbeMac();
             long currentTime = System.currentTimeMillis();
             //long currentTime = 1536885977836l;
-            long beginTime = currentTime - 60 * 1000;
-            BraceletDataRequest braceletdataRequest = new BraceletDataRequest(beginTime, currentTime, probeMac);
+            long startTime = currentTime - 60 * 1000;
+            BraceletDataRequest braceletdataRequest = new BraceletDataRequest(startTime, currentTime, probeMac);
             //计算10s内收到数据条数
             long regularThroughput = braceletService.countBraceletData(braceletdataRequest);
             probeResponse.setRegularThroughput(regularThroughput);
@@ -149,8 +149,8 @@ public class ProbeService {
         List<Probe> probeList = probeDao.selectProbe(probe);
         probeList.stream().forEach(probeObj -> {
             try{
-                long beginTime = Long.parseLong(endTime) - 60 * 1000;
-                BraceletDataRequest braceletdataRequest = new BraceletDataRequest(beginTime, Long.parseLong(endTime), probeObj.getProbeMac());
+                long startTime = Long.parseLong(endTime) - 60 * 1000;
+                BraceletDataRequest braceletdataRequest = new BraceletDataRequest(startTime, Long.parseLong(endTime), probeObj.getProbeMac());
                 //计算1分钟内收到数据条数
                 long regularThroughput = braceletService.countBraceletData(braceletdataRequest);
                 probeMacList.add(probeObj.getProbeMac());
@@ -169,14 +169,14 @@ public class ProbeService {
         return probeResponse;
     }
 
-    public ProbeResponse getProbeThroughtoutListByTimeWithMac(String beginTime, String endTime) {
+    public ProbeResponse getProbeThroughtoutListByTimeWithMac(String startTime, String endTime) {
         Probe probe = new Probe();
         List<String> probeMacList = new ArrayList<>();
         List<Long> probeThroughtoutList = new ArrayList<>();
         List<Probe> probeList = probeDao.selectProbe(probe);
         probeList.stream().forEach(probeObj -> {
             try{
-                BraceletDataRequest braceletdataRequest = new BraceletDataRequest(Long.parseLong(beginTime), Long.parseLong(endTime), probeObj.getProbeMac());
+                BraceletDataRequest braceletdataRequest = new BraceletDataRequest(Long.parseLong(startTime), Long.parseLong(endTime), probeObj.getProbeMac());
                 //计算收到数据条数
                 long regularThroughput = braceletService.countBraceletData(braceletdataRequest);
                 probeMacList.add(probeObj.getProbeMac());
@@ -201,8 +201,8 @@ public class ProbeService {
 
     public double getLocation(String braceletMac) {
         long endTime = System.currentTimeMillis();
-        long beginTime = endTime - 60 * 1000;
-        BraceletDataRequest braceletdataRequest = new BraceletDataRequest(beginTime, endTime);
+        long startTime = endTime - 60 * 1000;
+        BraceletDataRequest braceletdataRequest = new BraceletDataRequest(startTime, endTime);
         braceletdataRequest.setBraceletMac(braceletMac);
         //计算1分钟内收到数据条数
         double result = 0;
@@ -237,8 +237,8 @@ public class ProbeService {
 
             String probeMac = probeResponse.getProbeMac();
             long currentTime = System.currentTimeMillis();
-            long beginTime = currentTime - 60 * 1000;
-            BraceletDataRequest braceletdataRequest = new BraceletDataRequest(beginTime, currentTime, probeMac);
+            long startTime = currentTime - 60 * 1000;
+            BraceletDataRequest braceletdataRequest = new BraceletDataRequest(startTime, currentTime, probeMac);
             //计算10s内收到数据条数
             long regularThroughput = braceletService.countBraceletData(braceletdataRequest);
             probeResponse.setRegularThroughput(regularThroughput);

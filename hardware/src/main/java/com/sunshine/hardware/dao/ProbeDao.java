@@ -32,13 +32,31 @@ public interface ProbeDao {
         public String updateProbe(@Param("probe") Probe probe){
             return new SQL(){{
                 UPDATE("probe");
-                SET("status = #{probe.status}");
-                SET("location = #{probe.location}");
-                SET("is_normal = #{probe.isNormal}");
-                SET("regular_throughput= #{probe.regularThroughput}");
-                SET("on_line= #{probe.onLine}");
-                SET("version= #{probe.version}");
-                WHERE("id = #{probe.id}");
+                if(probe.getStatus() != null){
+                    SET("status = #{probe.status}");
+                }
+                if(StringUtils.isNotBlank(probe.getLocation())){
+                    SET("location = #{probe.location}");
+                }
+                if(probe.getIsNormal() != null){
+                    SET("is_normal = #{probe.isNormal}");
+                }
+                if(probe.getRegularThroughput() != null){
+                    SET("regular_throughput= #{probe.regularThroughput}");
+                }
+                if(probe.getOnLine() != null){
+                    SET("on_line= #{probe.onLine}");
+                }
+                if(StringUtils.isNotBlank(probe.getVersion())){
+                    SET("version= #{probe.version}");
+                }
+                if(StringUtils.isNotBlank(probe.getProbeMac())){
+                    WHERE("probe_mac = #{probe.probeMac}");
+                }
+                if(probe.getId() != 0){
+                    WHERE("id = #{probe.id}");
+                }
+
             }}.toString();
         }
 

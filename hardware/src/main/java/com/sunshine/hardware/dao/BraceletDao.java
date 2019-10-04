@@ -38,16 +38,16 @@ public interface BraceletDao {
                 SELECT("id, bracelet_mac as braceletMac, heart_rate as heartRate, step, active, sleep, skip_model as skipModel, skip_num as skipNum, skip_time as skipTime, version, utc, static_heart_rate as staticHeartRate, probe_mac as probeMac, uuid, add_time as addTime, battery, signal_value as signalValue ");
                 FROM(tableName);
                 if(StringUtils.isNotBlank(braceletDataRequest.getProbeMac())){
-                    WHERE("probe_mac = #{braceletData.probeMac}");
+                    WHERE("probe_mac = #{braceletDataRequest.probeMac}");
                 }
                 if(StringUtils.isNotBlank(braceletDataRequest.getBraceletMac())){
-                    WHERE("bracelet_mac = #{braceletData.braceletMac}");
+                    WHERE("bracelet_mac = #{braceletDataRequest.braceletMac}");
                 }
                 if(braceletDataRequest.getSkipModel() != null){
-                    WHERE("skip_model = #{braceletData.skipModel}");
+                    WHERE("skip_model = #{braceletDataRequest.skipModel}");
                 }
-                if(braceletDataRequest.getBeginTime() != null && braceletDataRequest.getEndTime() != null){
-                    WHERE("add_time > #{braceletData.startTime} and add_time < #{braceletData.endTime}");
+                if(braceletDataRequest.getStartTime() != null && braceletDataRequest.getEndTime() != null){
+                    WHERE("add_time > #{braceletDataRequest.startTime} and add_time < #{braceletDataRequest.endTime}");
                 }
             }}.toString() + pageStr.toString();
         }
@@ -65,7 +65,7 @@ public interface BraceletDao {
                 if(braceletDataRequest.getSkipModel() != null){
                     WHERE("skip_model = #{braceletDataRequest.skipModel}");
                 }
-                if(braceletDataRequest.getBeginTime() != null && braceletDataRequest.getEndTime() != null){
+                if(braceletDataRequest.getStartTime() != null && braceletDataRequest.getEndTime() != null){
                     WHERE("add_time > #{braceletDataRequest.startTime} and add_time < #{braceletDataRequest.endTime}");
                 }
             }}.toString();

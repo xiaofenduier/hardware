@@ -110,19 +110,6 @@
 				title : '探针mac',
                 sortable : true
 			},{
-                field : 'statusStr',
-                title : '实时状态',
-                sortable : true,
-                formatter:function(value,row,index){
-                    var style = "";
-                    if(value == "normal"){
-                        style = '<span style="color:greenyellow">'+value+'</span>';
-                    }else{
-                        style = '<span style="color:red">'+value+'</span>';
-                    }
-                    return style;
-                }
-            },{
                 field : 'onLineStr',
                 title : '在线状态',
                 sortable : true,

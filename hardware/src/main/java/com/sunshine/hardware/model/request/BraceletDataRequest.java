@@ -5,7 +5,7 @@ import com.sunshine.hardware.model.BraceletData;
 
 public class BraceletDataRequest extends BraceletData {
 
-    private Long beginTime;
+    private Long startTime;
     private Long endTime;
     private String probeMac;
     private String braceletMac;
@@ -13,14 +13,14 @@ public class BraceletDataRequest extends BraceletData {
     public BraceletDataRequest() {
     }
 
-    public BraceletDataRequest(Long beginTime, Long endTime, String probeMac) {
-        this.beginTime = beginTime;
+    public BraceletDataRequest(Long startTime, Long endTime, String probeMac) {
+        this.startTime = startTime;
         this.endTime = endTime;
         this.probeMac = probeMac;
     }
 
-    public BraceletDataRequest(Long beginTime, Long endTime) {
-        this.beginTime = beginTime;
+    public BraceletDataRequest(Long startTime, Long endTime) {
+        this.startTime = startTime;
         this.endTime = endTime;
     }
 
@@ -34,18 +34,22 @@ public class BraceletDataRequest extends BraceletData {
         this.braceletMac = braceletMac;
     }
 
-    public Long getBeginTime() {
-        return beginTime;
+    @Override
+    public Long getStartTime() {
+        return startTime;
     }
 
-    public void setBeginTime(Long beginTime) {
-        this.beginTime = beginTime;
+    @Override
+    public void setStartTime(Long startTime) {
+        this.startTime = startTime;
     }
 
+    @Override
     public Long getEndTime() {
         return endTime;
     }
 
+    @Override
     public void setEndTime(Long endTime) {
         this.endTime = endTime;
     }

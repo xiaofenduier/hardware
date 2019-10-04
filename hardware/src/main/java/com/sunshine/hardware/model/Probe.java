@@ -13,7 +13,7 @@ public class Probe extends Page {
     //位置
     private String location;
     //是否运行正常
-    private int isNormal;
+    private Integer isNormal;
     //实时吞吐量
     private Long regularThroughput;
 
@@ -71,11 +71,11 @@ public class Probe extends Page {
         this.location = location;
     }
 
-    public int getIsNormal() {
+    public Integer getIsNormal() {
         return isNormal;
     }
 
-    public void setIsNormal(int isNormal) {
+    public void setIsNormal(Integer isNormal) {
         this.isNormal = isNormal;
     }
 

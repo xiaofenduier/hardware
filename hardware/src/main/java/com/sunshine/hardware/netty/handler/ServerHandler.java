@@ -280,6 +280,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<byte[]> {
                                     rb = ReturnBody.success(qgv);
                                     // 如网关固件版本号比服务器上的低，可以送发起固件升级指令
                                     Probe probe = new Probe();
+                                    probe.setProbeMac(mac);
                                     probe.setVersion(qgv.getAppVersion().toString());
                                     probeService.updateProbe(probe);
                                 }

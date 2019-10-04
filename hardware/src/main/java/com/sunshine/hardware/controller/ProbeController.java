@@ -170,9 +170,9 @@ public class ProbeController {
 
 	@RequestMapping("getProbeThroughtoutListByTimeWithMac")
 	@ResponseBody
-	public ReturnBody getProbeThroughtoutListByTimeWithMac(String beginTime, String endTime){
+	public ReturnBody getProbeThroughtoutListByTimeWithMac(String startTime, String endTime){
 		ReturnBody returnBody = ReturnBody.success();
-		ProbeResponse probeResponse = probeService.getProbeThroughtoutListByTimeWithMac(beginTime, endTime);
+		ProbeResponse probeResponse = probeService.getProbeThroughtoutListByTimeWithMac(startTime, endTime);
 		returnBody.setData(probeResponse);
 		return returnBody;
 	}
