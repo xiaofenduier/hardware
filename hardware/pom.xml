@@ -10,8 +10,9 @@
     </parent>
     <groupId>com.sunshine</groupId>
     <artifactId>hardware</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
     <name>hardware</name>
+    <version>0.0.1-SNAPSHOT</version>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -91,6 +92,13 @@
             <version>4.4.10</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.sunshine.hardware</groupId>
+            <artifactId>cositea</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/src/main/resources/lib/cositea-conver-1.0.0.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
@@ -98,6 +106,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
             </plugin>
         </plugins>
     </build>
