@@ -180,8 +180,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<byte[]> {
                                                 //执行存数据操作， 数据上报比较频繁，建议存入nosql 内存数据库
                                                 log.info("接收:"+deviceData.getDevMac()+"的数据:"+bd.toString());
                                                 int hour = TimeUtil.getHourOfDay();
-                                                if(bd.getHeartRate() > 0 && hour >= 8 && hour <= 24 ){
+                                                if(bd.getHeartRate() > 0 && hour >= 8 && hour <= 20 ){
                                                     braceletService.insertBraceletData(bd);
+                                                }else{
+                                                    log.info("heartrate: {}, hour: {}", bd.getHeartRate(), hour);
                                                 }
                                                 break;
                                             //默认汇诚和设备
