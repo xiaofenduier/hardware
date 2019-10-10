@@ -125,7 +125,11 @@ public class ServerHandler extends SimpleChannelInboundHandler<byte[]> {
                                         //如用户自己的设备，可以另行解析
                                         switch (deviceData.getDeviceType()+""+deviceData.getDeviceModel()) {
                                             //r7体能检测手环
-                                            case "4804":
+                                            case "0000":
+                                                break;
+                                            //默认汇诚和设备
+                                            default:
+                                                log.info("接收"+deviceData.getDevMac()+"的自定义数据"+deviceData.getHexString());
                                                 BraceletData bd=new BraceletData();
                                                 bd.setProbeMac(mac);
                                                 String braceletMac = deviceData.getDevMac();
@@ -185,10 +189,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<byte[]> {
                                                 }else{
                                                     log.info("heartrate: {}, hour: {}", bd.getHeartRate(), hour);
                                                 }
-                                                break;
-                                            //默认汇诚和设备
-                                            default:
-                                                log.info("接收"+deviceData.getDevMac()+"的自定义数据"+deviceData.getHexString());
                                                 break;
                                         }
     								}
