@@ -137,8 +137,10 @@ public class ServerHandler extends SimpleChannelInboundHandler<byte[]> {
                                                 String braceletMacTwo = braceletMac.substring(2,4);
                                                 String braceletMacThree = braceletMac.substring(4,6);
                                                 String braceletMacFour = braceletMac.substring(6,8);
+                                                String braceletMacFive = braceletMac.substring(8,10);
+                                                String braceletMacSix = braceletMac.substring(10,12);
                                                 StringBuilder builder = new StringBuilder();
-                                                builder.append(braceletMacFour).append(braceletMacThree).append(braceletMacTwo).append(braceletMacOne);
+                                                builder.append(braceletMacSix).append(braceletMacFive).append(braceletMacFour).append(braceletMacThree).append(braceletMacTwo).append(braceletMacOne);
                                                 bd.setBraceletMac(builder.toString());
 
                                                 bd.setSignalValue(deviceData.getRssi());
