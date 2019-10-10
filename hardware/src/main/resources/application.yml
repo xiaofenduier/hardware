@@ -31,3 +31,5 @@ spring:
       username: root
       password: 123
 
+logging:
+  file: braceletdata.log
